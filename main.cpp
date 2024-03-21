@@ -17,6 +17,7 @@ int menu(){
     cout << "---------------------------------\n";
     cout << "Digite una opcion: ";
     cin >> op;
+    cout << endl;
     return op;
 }
 Cliente* agregarCliente(){
@@ -47,18 +48,12 @@ Cliente* buscarCliente(Cliente* lstClientes[NUM], int contaClientes, int id){
     }
     return cliente;
 }
-Prestamo* agregarPrestamo(Cliente* lstClientes[NUM], int contaClientes){
-    int id, numPrestamo, d, m, anio;
+Prestamo* agregarPrestamo(Cliente* lstClientes[NUM], int contaClientes, Cliente* cliente){
+    int numPrestamo, d, m, anio;
     float montoAprob;
-    Cliente* cliente = NULL;
     Prestamo* prestamo = NULL;
     Fecha* fecha = NULL;
 
-    cout << "Digite el id del cliente: ";
-    cin >> id;
-    cliente = buscarCliente(lstClientes, contaClientes, id);
-
-    if(cliente != NULL){
         cout << "Digite el numero del prestamo: ";
         cin >> numPrestamo;
         cout << "Digite la fecha en que se aprobo (dd/mm/aa): \n";
@@ -69,10 +64,7 @@ Prestamo* agregarPrestamo(Cliente* lstClientes[NUM], int contaClientes){
         cin >> montoAprob;
         fecha = new Fecha(d,m,anio);
         prestamo = new Prestamo(numPrestamo,cliente,fecha, montoAprob);
-    }else{
-        cout << "-------------------------------------\n";
-        cout << "ERROR.NO SE HA ENCONTRADO EL CLIENTE\n";
-    }
+
     return prestamo;
 }
 Prestamo* buscarPrestamo(Prestamo* lstPrestamos[NUM], int contaPrestamos, int numPrestamo){
@@ -89,18 +81,12 @@ Prestamo* buscarPrestamo(Prestamo* lstPrestamos[NUM], int contaPrestamos, int nu
     }
     return prestamo;
 }
-Pago* hacerPago(Pago* lstPagos[NUM], int contaPagos, Prestamo* lstPrestamos[NUM], int contaPrestamos){
+Pago* hacerPago(Pago* lstPagos[NUM], int contaPagos, Prestamo* lstPrestamos[NUM], int contaPrestamos, Prestamo* prestamo){
     int numPrestamo, d, m, anio;
     float montoPago;
     Pago* pago = NULL;
-    Prestamo* prestamo = NULL;
     Fecha* fecha = NULL;
 
-    cout << "Digite el numero de prestamo: ";
-    cin >> numPrestamo;
-    prestamo = buscarPrestamo(lstPrestamos, contaPrestamos, numPrestamo);
-
-    if(prestamo != NULL){
         cout << "Digite el monto de pago: $";
         cin >> montoPago;
         cout << "Digite la fecha del pago (dd/mm/aa): \n";
@@ -109,81 +95,73 @@ Pago* hacerPago(Pago* lstPagos[NUM], int contaPagos, Prestamo* lstPrestamos[NUM]
         cin >> anio;
         fecha = new Fecha(d,m,anio);
         pago = new Pago(fecha, montoPago);
+
         if(prestamo->hacerPago(pago)){
-            cout << "PAGO REALIZADO EXITOSAMENTE\n";
+            cout << " -PAGO REALIZADO EXITOSAMENTE-\n";
         }else{
-            cout << "El PAGO NO PUDO REALIZARSE\n";
+            cout << " -El PAGO NO PUDO REALIZARSE-\n";
         }
-    }else{
-        cout << "-------------------------------------\n";
-        cout << "ERROR.NO SE HA ENCONTRADO EL PRESTAMO\n";
-    }
     return pago;
 }
 void mostrarlstClientes(Cliente* lstClientes[NUM], int contaClientes){
     if(contaClientes == 0){
         cout << "La lista de clientes esta vacia.\n";
     }else{
-        cout << "Id\t Nombre\t Apellido\n";
+        cout << "Id\tNombre\t Apellido\n";
         for(int i=0; i < contaClientes;i++){
-            cout << lstClientes[i]->getIdCliente() << "\t ";
-            cout << lstClientes[i]->getNombre() << "\t ";
+            cout << lstClientes[i]->getIdCliente() << "\t";
+            cout << lstClientes[i]->getNombre() << "\t   ";
             cout << lstClientes[i]->getApellido() << "\n ";
         }
     }
 }
 void mostrarlstPrestamos(Prestamo* lstPrestamos[NUM], int contaPrestamos){
     if(contaPrestamos == 0){
-        cout << "La lista de prestamos esta vacia\n";
+        cout << "-La lista de prestamos esta vacia-\n";
     }else{
-        cout << "nPrestamo\tNombre\t Apellido\t fechaAprob\t MontoAprobado\n";
+        cout << "nPrestamo\tNombre\tApellido\tfechaAprob\tMontoAprobado\n";
         for(int i=0; i < contaPrestamos; i++){
-            cout << lstPrestamos[i]->getNumeroPrestamo() << "\t";
-            cout << lstPrestamos[i]->getCliente()->getNombre() << "\t ";
-            cout << lstPrestamos[i]->getCliente()->getApellido() << "\t ";
+            cout << lstPrestamos[i]->getNumeroPrestamo() << "\t       ";
+            cout << lstPrestamos[i]->getCliente()->getNombre() << "\t  ";
+            cout << lstPrestamos[i]->getCliente()->getApellido() << "\t  ";
             lstPrestamos[i]->getFechaAprobacion()->mostrarFecha();
-            cout << "\t";
+            cout << "\t    $";
             cout << lstPrestamos[i]->getMontoAprobado() << "\n";
         }
     }
 }
-void mostrarDetalles(Prestamo* lstPrestamos[NUM], int contaPrestamos, Pago* lstPagos[NUM], int contadorPagos){
-    int numPrestamo;
-    Prestamo* prestamo = NULL;
+void mostrarDetalles(Prestamo* lstPrestamos[NUM], int contaPrestamos, Pago* lstPagos[NUM], int contadorPagos, Prestamo* prestamo){
 
-    cout << "Digite el numero del prestamo: ";
-    cin >> numPrestamo;
-    prestamo = buscarPrestamo(lstPrestamos, contaPrestamos, numPrestamo);
-
-    if(prestamo->getNumeroPrestamo() == 0){
-        cout << "No se ha encontrado el prestamo indicado\n";
-    }else{
+        cout << "--------------------------------------------------\n";
         cout << "Numero de Prestamo: " << prestamo->getNumeroPrestamo() << endl;
         cout << "Cliente: " << prestamo->getCliente()->getNombre() << " " << prestamo->getCliente()->getApellido() << endl;
         cout << "Fecha de aprobacion: ";
         prestamo->getFechaAprobacion()->mostrarFecha();
         cout << endl;
         cout << "Monto aprobado: $" << prestamo->getMontoAprobado() << endl;
+        cout << "--------------------------------------------------\n";
+
         if(prestamo->getContadorPagos() == 0){
             cout << "NO HAY PAGOS REALIZADOS\n";
         }else{
-            cout << "Lista de Pagos: " << endl;
+            cout << "\nLista de Pagos: " << endl;
             lstPagos = prestamo->getLstPagos();
             cout << "FechaPago\tMontoPagado\n";
             for(int i=0; i < prestamo->getContadorPagos(); i++){
                 lstPagos[i]->getFechaPago()->mostrarFecha();
                 cout << "\t ";
-                cout << "  $" << lstPagos[i]->getMontoPago() << endl;
+                cout << "     $" << lstPagos[i]->getMontoPago() << endl;
             }
         }
-    }
 }
 int main(){
     int op=0, contaPagos=0, contaPrestamos=0, contaClientes=0;
-    int numPrestamo=0;
+    int numPrestamo=0, id=0;
     Pago* lstPagos[NUM];
     Prestamo* lstPrestamos[NUM];
     Cliente* lstClientes[NUM];
+    Cliente* cliente = NULL;
+    Prestamo* prestamo = NULL;
 
     do{
         system("cls");
@@ -201,22 +179,40 @@ int main(){
                 break;
             case 2:
                 ///Agregar Prestamo
-                if(contaPrestamos < NUM){
-                    lstPrestamos[contaPrestamos] = agregarPrestamo(lstClientes, contaClientes);
-                    contaPrestamos++;
-                    cout << "\n--Prestamo agregado satisfactoriamente!--\n";
+                cout << "Digite el id del cliente: ";
+                cin >> id;
+                cliente = buscarCliente(lstClientes, contaClientes, id);
+
+                if(cliente != NULL){
+                        if(contaPrestamos < NUM){
+                        lstPrestamos[contaPrestamos] = agregarPrestamo(lstClientes, contaClientes, cliente);
+                        contaPrestamos++;
+                        cout << "\n--Prestamo agregado satisfactoriamente!--\n";
+                    }else{
+                        cout << "\nLa lista de prestamos esta llena\n";
+                    }
                 }else{
-                    cout << "\nLa lista de prestamos esta llena\n";
+                    cout << "------------------------------------\n";
+                    cout << "ERROR.NO SE HA ENCONTRADO EL CLIENTE\n";
                 }
                 break;
             case 3:
                 ///Hacer Pagos
-                if(contaPagos < NUM){
-                    lstPagos[contaPagos] = hacerPago(lstPagos, contaPagos, lstPrestamos, contaPrestamos);
-                    contaPagos++;
-                    cout << "\n--Pago agregado satisfactoriamente!--\n";
+                cout << "Digite el numero de prestamo: ";
+                cin >> numPrestamo;
+                prestamo = buscarPrestamo(lstPrestamos, contaPrestamos, numPrestamo);
+
+                if(prestamo != NULL){
+                    if(contaPagos < NUM){
+                        lstPagos[contaPagos] = hacerPago(lstPagos, contaPagos, lstPrestamos, contaPrestamos, prestamo);
+                        contaPagos++;
+                        cout << "\n--Pago agregado satisfactoriamente!--\n";
+                    }else{
+                        cout << "\nLa lista de pagos esta llena\n";
+                    }
                 }else{
-                    cout << "\nLa lista de pagos esta llena\n";
+                    cout << "-------------------------------------\n";
+                    cout << "ERROR.NO SE HA ENCONTRADO EL PRESTAMO\n";
                 }
                 break;
             case 4:
@@ -229,7 +225,16 @@ int main(){
                 break;
             case 6:
                 ///Mostrar detalles del prestamo
-                mostrarDetalles(lstPrestamos, contaPrestamos, lstPagos, contaPagos);
+                cout << "Digite el numero del prestamo: ";
+                cin >> numPrestamo;
+                prestamo = buscarPrestamo(lstPrestamos, contaPrestamos, numPrestamo);
+
+                if(prestamo == NULL){
+                    cout << "----------- ERROR -----------\n";
+                    cout << "No se ha encontrado el prestamo\n";
+                }else{
+                    mostrarDetalles(lstPrestamos, contaPrestamos, lstPagos, contaPagos, prestamo);
+                }
                 break;
             case 7:
                 ///Salir
