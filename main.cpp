@@ -132,19 +132,25 @@ void mostrarlstPrestamos(Prestamo* lstPrestamos[NUM], int contaPrestamos){
 }
 void mostrarDetalles(Prestamo* lstPrestamos[NUM], int contaPrestamos, Pago* lstPagos[NUM], int contadorPagos, Prestamo* prestamo){
 
-        cout << "--------------------------------------------------\n";
+        cout << "-----------------------------------------------\n";
         cout << "Numero de Prestamo: " << prestamo->getNumeroPrestamo() << endl;
         cout << "Cliente: " << prestamo->getCliente()->getNombre() << " " << prestamo->getCliente()->getApellido() << endl;
         cout << "Fecha de aprobacion: ";
         prestamo->getFechaAprobacion()->mostrarFecha();
         cout << endl;
         cout << "Monto aprobado: $" << prestamo->getMontoAprobado() << endl;
-        cout << "--------------------------------------------------\n";
+        cout << "Saldo pendiente: $";
+        if(prestamo->getSaldoPendiente() == 0){
+            cout << "NO HAY SALDO PENDIENTE\n";
+        }else{
+            cout << prestamo->getSaldoPendiente() << "\n";
+        }
+        cout << "-----------------------------------------------\n";
 
         if(prestamo->getContadorPagos() == 0){
             cout << "NO HAY PAGOS REALIZADOS\n";
         }else{
-            cout << "\nLista de Pagos: " << endl;
+            cout << "\t-Lista de Pagos- " << endl;
             lstPagos = prestamo->getLstPagos();
             cout << "FechaPago\tMontoPagado\n";
             for(int i=0; i < prestamo->getContadorPagos(); i++){
@@ -152,6 +158,7 @@ void mostrarDetalles(Prestamo* lstPrestamos[NUM], int contaPrestamos, Pago* lstP
                 cout << "\t ";
                 cout << "     $" << lstPagos[i]->getMontoPago() << endl;
             }
+            cout << "-----------------------------------------------\n";
         }
 }
 int main(){
